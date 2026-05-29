@@ -1,4 +1,4 @@
-function gameboard() {
+function gameBoard() {
   const blocks = [];
 
   (() => {
@@ -58,4 +58,32 @@ function gameboard() {
   }
 
   return { playCross, playNought, displayBoard };
+}
+
+function player(name) {
+  const name = name;
+  let score = 0;
+  let hasTurn = false;
+
+  function getName() {
+    return name;
+  }
+
+  function incrementScore() {
+    score++;
+  }
+
+  function getScore() {
+    return score;
+  }
+
+  function toggleTurn() {
+    hasTurn = !hasTurn;
+  }
+
+  function getTurn() {
+    return hasTurn;
+  }
+
+  return { getName, incrementScore, getScore, toggleTurn, getTurn };
 }
