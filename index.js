@@ -100,7 +100,6 @@ function player(name, symbol) {
     return symbol;
   }
 
-
   return { getName, incrementScore, getScore, getSymbol };
 }
 
@@ -109,9 +108,9 @@ function playRound(player1, player2) {
 
   (function roundOver() {
     for (let i = 0; i < 9; i++) {
-      gameboard.playCross(i + 2)
+      gameboard.playCross(i + 2);
       if (winner() || boardIsFull()) break;
-      gameboard.playNought((i + 1))
+      gameboard.playNought(i + 1);
       if (winner() || boardIsFull()) break;
     }
     console.log(player1.getScore());
@@ -202,11 +201,23 @@ function playRound(player1, player2) {
         }
       }
     }
+    return false;
   }
-  return false;
 }
 
-const player1 = player("bitch", "cross");
-const player2 = player("nigga", "nought");
+function playTicTacToe(numOfRounds) {
+  const player1 = player("bitch", "cross");
+  const player2 = player("nigga", "nought");
 
-playRound(player1, player2);
+  while (player1.getScore() < numOfRounds && player2.getScore() < numOfRounds) {
+    playRound(player1, player2);
+  }
+
+  return (function declareWinner() {
+    return player1.getScore() === numOfRounds
+      ? "player 1 wins"
+      : "player 2 wins";
+  })();
+}
+
+console.log(playTicTacToe(3));
