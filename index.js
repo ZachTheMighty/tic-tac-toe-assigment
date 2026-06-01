@@ -122,7 +122,7 @@ function playRound(player1, player2, bestOfX) {
   const gameboard = gameBoard();
   const blockDivs = document.querySelectorAll(".gameboard > *");
 
-  const nextButton = document.querySelector("button");
+  const nextButton = document.querySelector("div.gg + button");
 
   const randomNumber = Math.floor(Math.random() * 10) + 2;
   const coinToss = randomNumber % 2 === 0 ? "heads" : "tails";
@@ -140,8 +140,10 @@ function playRound(player1, player2, bestOfX) {
             player1.toggleTurn();
 
             if (winner()) {
-              document.querySelector(".score").textContent =
-                `${player1.getScore()} - ${player2.getScore()}`;
+              document.querySelector(".score-1").textContent =
+                player1.getScore();
+              document.querySelector(".score-2").textContent =
+                player2.getScore();
               domDisplay().disableBlocks();
 
               if (
@@ -162,16 +164,13 @@ function playRound(player1, player2, bestOfX) {
                 domDisplay().resetDivBoard();
                 domDisplay().enableBlocks();
                 nextButton.classList.add("hide-button");
+                document.querySelector(".gg").textContent = "";
               });
               return;
             }
 
             if (boardIsFull()) {
-              document.querySelector(".score").append(
-                Object.assign(document.createElement("div"), {
-                  textContent: "tie",
-                }),
-              );
+              document.querySelector(".gg").textContent = "tie";
 
               domDisplay().disableBlocks();
 
@@ -193,6 +192,7 @@ function playRound(player1, player2, bestOfX) {
                 domDisplay().resetDivBoard();
                 domDisplay().enableBlocks();
                 nextButton.classList.add("hide-button");
+                document.querySelector(".gg").textContent = "";
               });
               return;
             }
@@ -203,8 +203,10 @@ function playRound(player1, player2, bestOfX) {
             player1.toggleTurn();
 
             if (winner()) {
-              document.querySelector(".score").textContent =
-                `${player1.getScore()} - ${player2.getScore()}`;
+              document.querySelector(".score-1").textContent =
+                player1.getScore();
+              document.querySelector(".score-2").textContent =
+                player2.getScore();
               domDisplay().disableBlocks();
 
               if (
@@ -225,15 +227,12 @@ function playRound(player1, player2, bestOfX) {
                 domDisplay().resetDivBoard();
                 domDisplay().enableBlocks();
                 nextButton.classList.add("hide-button");
+                document.querySelector(".gg").textContent = "";
               });
               return;
             }
             if (boardIsFull()) {
-              document.querySelector(".score").append(
-                Object.assign(document.createElement("div"), {
-                  textContent: "tie",
-                }),
-              );
+              document.querySelector(".gg").textContent = "tie";
 
               domDisplay().disableBlocks();
 
@@ -255,6 +254,7 @@ function playRound(player1, player2, bestOfX) {
                 domDisplay().resetDivBoard();
                 domDisplay().enableBlocks();
                 nextButton.classList.add("hide-button");
+                document.querySelector(".gg").textContent = "";
               });
               return;
             }
@@ -352,13 +352,6 @@ function playRound(player1, player2, bestOfX) {
   }
 }
 
-function playTicTacToe(bestOfX) {
-  const player1 = player("bitch", "cross", "heads");
-  const player2 = player("nigga", "nought", "tails");
-
-  playRound(player1, player2, bestOfX);
-}
-
 function domDisplay() {
   const blockDivs = document.querySelectorAll(".gameboard > *");
 
@@ -375,6 +368,51 @@ function domDisplay() {
   }
 
   return { disableBlocks, enableBlocks, resetDivBoard };
+}
+
+function playTicTacToe(bestOfX) {
+  const form = document.querySelector("form");
+  let player1;
+  let player2;
+  let numOfFormSubmits = 0;
+
+  form.addEventListener("submit", (event) => {
+    numOfFormSubmits++;
+    event.preventDefault();
+
+    if (numOfFormSubmits === 1) {
+      player1 = player(
+        form.name.value,
+        form.symbol.value,
+        form.coinGuess.value,
+      );
+      document.querySelector(".name-1").textContent = player1.getName();
+      document.querySelector(".symbol-1").textContent = player1.getSymbol();
+      document.querySelector(".score-1").textContent = "0";
+
+      form.symbol[0].checked
+        ? (form.symbol[0].disabled = true)
+        : (form.symbol[1].disabled = true);
+
+      form.coinGuess[0].checked
+        ? (form.coinGuess[0].disabled = true)
+        : (form.coinGuess[1].disabled = true);
+    }
+
+    if (numOfFormSubmits === 2) {
+      form.classList.add("hide-form");
+      player2 = player(
+        form.name.value,
+        form.symbol.value,
+        form.coinGuess.value,
+      );
+      document.querySelector(".name-2").textContent = player2.getName();
+      document.querySelector(".symbol-2").textContent = player2.getSymbol();
+      document.querySelector(".score-2").textContent = "0";
+
+      playRound(player1, player2, bestOfX);
+    }
+  });
 }
 
 playTicTacToe(3);

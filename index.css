@@ -18,10 +18,40 @@ body {
     sans-serif;
   margin: 0;
   padding: 0;
+  display: grid;
+  align-items: center;
+  grid-template-columns: 2fr 1fr 2fr;
+}
+
+body > div {
   display: flex;
   flex-flow: column nowrap;
-  justify-content: center;
   align-items: center;
+}
+
+fieldset + div {
+  display: flex;
+  justify-content: center;
+}
+
+form > * {
+  margin-bottom: 12px;
+}
+
+fieldset {
+  display: flex;
+}
+
+fieldset > div + div {
+  margin-left: 12px;
+}
+
+[type="text"] {
+  width: 100%;
+}
+
+.hide-form {
+  display: none;
 }
 
 .score {
@@ -32,18 +62,18 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  width: 400px;
   gap: 1px;
+  container-type: inline-size;
 }
 
 .gameboard > * {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100px;
+  aspect-ratio: 1 / 1;
   outline: 1px solid black;
   font-weight: 300;
-  font-size: 5rem;
+  font-size: 20cqw;
   user-select: none;
 }
 
