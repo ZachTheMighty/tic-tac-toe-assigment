@@ -6,30 +6,33 @@ function gameBoard() {
       blocks.push(
         (() => {
           let state = "empty";
+          const id = crypto.randomUUID();
 
           function setCross() {
             state = "cross";
-            displayBoard();
           }
 
           function setNought() {
             state = "nought";
-            displayBoard();
           }
 
           function emptyState() {
             state = "empty";
-            displayBoard();
           }
 
           function getState() {
             return state;
           }
 
+          function getId() {
+            return id;
+          }
+
           return {
             setCross,
             setNought,
             getState,
+            getId,
             emptyState,
           };
         })(),
@@ -43,29 +46,15 @@ function gameBoard() {
   ];
 
   function playCross(blockNum) {
-    if (blocks[blockNum - 1].getState() === "empty")
+    if (blocks[blockNum - 1].getState() === "empty") {
       blocks[blockNum - 1].setCross();
+    }
   }
 
   function playNought(blockNum) {
-    if (blocks[blockNum - 1].getState() === "empty")
+    if (blocks[blockNum - 1].getState() === "empty") {
       blocks[blockNum - 1].setNought();
-  }
-
-  function displayBoard() {
-    for (i = 0; i < 9; i++) {
-      const state = blocks[i].getState();
-
-      if (state === "empty") process.stdout.write("*");
-
-      if (state === "cross") process.stdout.write("X");
-
-      if (state === "nought") process.stdout.write("O");
-
-      if ((i !== 0 && i === 2) || i === 5 || i === 8)
-        process.stdout.write("\n");
     }
-    console.log();
   }
 
   function getBlocks() {
@@ -76,13 +65,19 @@ function gameBoard() {
     return martrix;
   }
 
-  return { playCross, playNought, displayBoard, getBlocks, getMatrix };
+  function resetBoard() {
+    blocks.forEach((block) => block.emptyState());
+  }
+
+  return { playCross, playNought, getBlocks, getMatrix, resetBoard };
 }
 
-function player(name, symbol) {
+function player(name, symbol, coinGuess) {
   this.name = name;
   this.symbol = symbol;
+  this.coinGuess = coinGuess;
   let score = 0;
+  let hasTurn = false;
 
   function getName() {
     return name;
@@ -100,21 +95,173 @@ function player(name, symbol) {
     return symbol;
   }
 
-  return { getName, incrementScore, getScore, getSymbol };
+  function getCoinGuess() {
+    return coinGuess;
+  }
+
+  function toggleTurn() {
+    hasTurn = !hasTurn;
+  }
+
+  function getTurn() {
+    return hasTurn;
+  }
+
+  return {
+    getName,
+    incrementScore,
+    getScore,
+    getSymbol,
+    toggleTurn,
+    getTurn,
+    getCoinGuess,
+  };
 }
 
-function playRound(player1, player2) {
+function playRound(player1, player2, bestOfX) {
   const gameboard = gameBoard();
+  const blockDivs = document.querySelectorAll(".gameboard > *");
+
+  const nextButton = document.querySelector("button");
+
+  const randomNumber = Math.floor(Math.random() * 10) + 2;
+  const coinToss = randomNumber % 2 === 0 ? "heads" : "tails";
+
+  if (coinToss === player1.getCoinGuess()) player1.toggleTurn();
 
   (function roundOver() {
     for (let i = 0; i < 9; i++) {
-      gameboard.playCross(i + 2);
-      if (winner() || boardIsFull()) break;
-      gameboard.playNought(i + 1);
-      if (winner() || boardIsFull()) break;
+      blockDivs[i].addEventListener("click", () => {
+        if (!blockDivs[i].hasChildNodes()) {
+          if (player1.getTurn()) {
+            gameboard.playCross(i + 1);
+            blockDivs[i].textContent = "X";
+
+            player1.toggleTurn();
+
+            if (winner()) {
+              document.querySelector(".score").textContent =
+                `${player1.getScore()} - ${player2.getScore()}`;
+              domDisplay().disableBlocks();
+
+              if (
+                player1.getScore() !== (bestOfX + 1) / 2 &&
+                player2.getScore() !== (bestOfX + 1) / 2
+              )
+                nextButton.classList.remove("hide-button");
+              else {
+                document.querySelector(".gg").textContent = `${
+                  player1.getScore() === (bestOfX + 1) / 2
+                    ? `${player1.getName()} wins`
+                    : `${player2.getName()} wins`
+                }`;
+              }
+
+              nextButton.addEventListener("click", () => {
+                gameboard.resetBoard();
+                domDisplay().resetDivBoard();
+                domDisplay().enableBlocks();
+                nextButton.classList.add("hide-button");
+              });
+              return;
+            }
+
+            if (boardIsFull()) {
+              document.querySelector(".score").append(
+                Object.assign(document.createElement("div"), {
+                  textContent: "tie",
+                }),
+              );
+
+              domDisplay().disableBlocks();
+
+              if (
+                player1.getScore() !== (bestOfX + 1) / 2 &&
+                player2.getScore() !== (bestOfX + 1) / 2
+              )
+                nextButton.classList.remove("hide-button");
+              else {
+                document.querySelector(".gg").textContent = `${
+                  player1.getScore() === (bestOfX + 1) / 2
+                    ? `${player1.getName()} wins`
+                    : `${player2.getName()} wins`
+                }`;
+              }
+
+              nextButton.addEventListener("click", () => {
+                gameboard.resetBoard();
+                domDisplay().resetDivBoard();
+                domDisplay().enableBlocks();
+                nextButton.classList.add("hide-button");
+              });
+              return;
+            }
+          } else {
+            gameboard.playNought(i + 1);
+            blockDivs[i].textContent = "O";
+
+            player1.toggleTurn();
+
+            if (winner()) {
+              document.querySelector(".score").textContent =
+                `${player1.getScore()} - ${player2.getScore()}`;
+              domDisplay().disableBlocks();
+
+              if (
+                player1.getScore() !== (bestOfX + 1) / 2 &&
+                player2.getScore() !== (bestOfX + 1) / 2
+              )
+                nextButton.classList.remove("hide-button");
+              else {
+                document.querySelector(".gg").textContent = `${
+                  player1.getScore() === (bestOfX + 1) / 2
+                    ? `${player1.getName()} wins`
+                    : `${player2.getName()} wins`
+                }`;
+              }
+
+              nextButton.addEventListener("click", () => {
+                gameboard.resetBoard();
+                domDisplay().resetDivBoard();
+                domDisplay().enableBlocks();
+                nextButton.classList.add("hide-button");
+              });
+              return;
+            }
+            if (boardIsFull()) {
+              document.querySelector(".score").append(
+                Object.assign(document.createElement("div"), {
+                  textContent: "tie",
+                }),
+              );
+
+              domDisplay().disableBlocks();
+
+              if (
+                player1.getScore() !== (bestOfX + 1) / 2 &&
+                player2.getScore() !== (bestOfX + 1) / 2
+              )
+                nextButton.classList.remove("hide-button");
+              else {
+                document.querySelector(".gg").textContent = `${
+                  player1.getScore() === (bestOfX + 1) / 2
+                    ? `${player1.getName()} wins`
+                    : `${player2.getName()} wins`
+                }`;
+              }
+
+              nextButton.addEventListener("click", () => {
+                gameboard.resetBoard();
+                domDisplay().resetDivBoard();
+                domDisplay().enableBlocks();
+                nextButton.classList.add("hide-button");
+              });
+              return;
+            }
+          }
+        }
+      });
     }
-    console.log(player1.getScore());
-    console.log(player2.getScore());
   })();
 
   function boardIsFull() {
@@ -205,19 +352,29 @@ function playRound(player1, player2) {
   }
 }
 
-function playTicTacToe(numOfRounds) {
-  const player1 = player("bitch", "cross");
-  const player2 = player("nigga", "nought");
+function playTicTacToe(bestOfX) {
+  const player1 = player("bitch", "cross", "heads");
+  const player2 = player("nigga", "nought", "tails");
 
-  while (player1.getScore() < numOfRounds && player2.getScore() < numOfRounds) {
-    playRound(player1, player2);
-  }
-
-  return (function declareWinner() {
-    return player1.getScore() === numOfRounds
-      ? "player 1 wins"
-      : "player 2 wins";
-  })();
+  playRound(player1, player2, bestOfX);
 }
 
-console.log(playTicTacToe(3));
+function domDisplay() {
+  const blockDivs = document.querySelectorAll(".gameboard > *");
+
+  function disableBlocks() {
+    blockDivs.forEach((block) => block.classList.add("disabled-block"));
+  }
+
+  function enableBlocks() {
+    blockDivs.forEach((block) => block.classList.remove("disabled-block"));
+  }
+
+  function resetDivBoard() {
+    blockDivs.forEach((block) => (block.textContent = ""));
+  }
+
+  return { disableBlocks, enableBlocks, resetDivBoard };
+}
+
+playTicTacToe(3);

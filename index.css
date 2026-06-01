@@ -19,8 +19,13 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
+  flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
+}
+
+.score {
+  text-align: center;
 }
 
 .gameboard {
@@ -31,7 +36,29 @@ body {
   gap: 1px;
 }
 
-.block {
+.gameboard > * {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 100px;
   outline: 1px solid black;
+  font-weight: 300;
+  font-size: 5rem;
+  user-select: none;
+}
+
+.cross {
+  color: blue;
+}
+
+.nought {
+  color: red;
+}
+
+.disabled-block {
+  pointer-events: none;
+}
+
+.hide-button {
+  display: none;
 }
