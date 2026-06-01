@@ -7,7 +7,7 @@
     <script src="index.js" defer></script>
   </head>
   <body>
-    <div class="player-1">
+    <div class="player-1 hide-player">
       <div class="name-1"></div>
       <div class="symbol-1"></div>
       <div class="score-1"></div>
@@ -24,6 +24,7 @@
             maxlength="10"
             required
             autocomplete="off"
+            autofocus
           />
         </div>
 
@@ -37,8 +38,9 @@
               value="cross"
               name="symbol"
               autocomplete="off"
+              required
             />
-            <label for="cross">Cross X</label>
+            <label for="cross">Cross (X)</label>
           </div>
 
           <div>
@@ -48,8 +50,9 @@
               value="nought"
               name="symbol"
               autocomplete="off"
+              required
             />
-            <label for="nought">Nought O</label>
+            <label for="nought">Nought (O)</label>
           </div>
         </fieldset>
 
@@ -63,6 +66,7 @@
               value="heads"
               name="coinGuess"
               autocomplete="off"
+              required
             />
             <label for="heads">Heads</label>
           </div>
@@ -74,6 +78,7 @@
               value="tails"
               name="coinGuess"
               autocomplete="off"
+              required
             />
             <label for="tails">Tails</label>
           </div>
@@ -94,11 +99,11 @@
         <div></div>
         <div></div>
       </div>
-      <div class="gg"></div>
+      <div class="gg hide-gg" onclick="location.reload()"></div>
       <button class="hide-button">Next round</button>
     </main>
 
-    <div class="player-2">
+    <div class="player-2 hide-player">
       <div class="name-2"></div>
       <div class="symbol-2"></div>
       <div class="score-2"></div>
