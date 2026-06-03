@@ -127,7 +127,10 @@ function playRound(player1, player2, bestOfX) {
   const randomNumber = Math.floor(Math.random() * 10) + 2;
   const coinToss = randomNumber % 2 === 0 ? "heads" : "tails";
 
-  if (coinToss === player1.getCoinGuess()) player1.toggleTurn();
+  if (coinToss === player1.getCoinGuess()) {
+    player1.toggleTurn();
+    domDisplay().givePlayerOneTurn();
+  } else domDisplay().givePlayerTwoTurn();
 
   (function roundOver() {
     for (let i = 0; i < 9; i++) {
@@ -144,6 +147,11 @@ function playRound(player1, player2, bestOfX) {
               blockDivs[i].classList.add("nought");
             }
 
+            domDisplay().getPlayerOneContainer().classList.contains("give-turn")
+              ? (domDisplay().takePlayerOneTurn(),
+                domDisplay().givePlayerTwoTurn())
+              : domDisplay().givePlayerOneTurn();
+
             player1.toggleTurn();
 
             if (winner()) {
@@ -159,12 +167,25 @@ function playRound(player1, player2, bestOfX) {
               )
                 nextButton.classList.remove("hide-button");
               else {
-                document.querySelector(".gg").textContent = `${
-                  player1.getScore() === (bestOfX + 1) / 2
-                    ? `${player1.getName()} Wins`
-                    : `${player2.getName()} Wins`
-                }`;
+                let winner = {
+                  player:
+                    player1.getScore() === (bestOfX + 1) / 2
+                      ? player1
+                      : player2,
+                  id: player1.getScore() > player2.getScore() ? 1 : 2,
+                };
+
+                document.querySelector(".gg").textContent =
+                  `${winner.player.getName()} Wins!!~?`;
+
                 document.querySelector(".gg").classList.remove("hide-gg");
+                domDisplay().takePlayerOneTurn();
+                domDisplay().takePlayerTwoTurn();
+                winner.id === 1
+                  ? domDisplay().getPlayerOneContainer().classList.add("winner")
+                  : domDisplay()
+                      .getPlayerTwoContainer()
+                      .classList.add("winner");
               }
 
               nextButton.addEventListener("click", () => {
@@ -182,20 +203,7 @@ function playRound(player1, player2, bestOfX) {
               nextButton.textContent = "tie";
 
               domDisplay().disableBlocks();
-
-              if (
-                player1.getScore() !== (bestOfX + 1) / 2 &&
-                player2.getScore() !== (bestOfX + 1) / 2
-              )
-                nextButton.classList.remove("hide-button");
-              else {
-                document.querySelector(".gg").textContent = `${
-                  player1.getScore() === (bestOfX + 1) / 2
-                    ? `${player1.getName()} Wins`
-                    : `${player2.getName()} Wins`
-                }`;
-                document.querySelector(".gg").classList.remove("hide-gg");
-              }
+              nextButton.classList.remove("hide-button");
 
               nextButton.addEventListener("click", () => {
                 gameboard.resetBoard();
@@ -218,6 +226,11 @@ function playRound(player1, player2, bestOfX) {
               blockDivs[i].classList.add("nought");
             }
 
+            domDisplay().getPlayerTwoContainer().classList.contains("give-turn")
+              ? (domDisplay().takePlayerTwoTurn(),
+                domDisplay().givePlayerOneTurn())
+              : domDisplay().givePlayerTwoTurn();
+
             player1.toggleTurn();
 
             if (winner()) {
@@ -233,12 +246,26 @@ function playRound(player1, player2, bestOfX) {
               )
                 nextButton.classList.remove("hide-button");
               else {
-                document.querySelector(".gg").textContent = `${
-                  player1.getScore() === (bestOfX + 1) / 2
-                    ? `${player1.getName()} Wins`
-                    : `${player2.getName()} Wins`
-                }`;
+                let winner = {
+                  player:
+                    player1.getScore() === (bestOfX + 1) / 2
+                      ? player1
+                      : player2,
+
+                  id: player1.getScore() > player2.getScore() ? 1 : 2,
+                };
+
+                document.querySelector(".gg").textContent =
+                  `${winner.player.getName()} Wins!!~?`;
+
                 document.querySelector(".gg").classList.remove("hide-gg");
+                domDisplay().takePlayerOneTurn();
+                domDisplay().takePlayerTwoTurn();
+                winner.id === 1
+                  ? domDisplay().getPlayerOneContainer().classList.add("winner")
+                  : domDisplay()
+                      .getPlayerTwoContainer()
+                      .classList.add("winner");
               }
 
               nextButton.addEventListener("click", () => {
@@ -255,19 +282,7 @@ function playRound(player1, player2, bestOfX) {
 
               domDisplay().disableBlocks();
 
-              if (
-                player1.getScore() !== (bestOfX + 1) / 2 &&
-                player2.getScore() !== (bestOfX + 1) / 2
-              )
-                nextButton.classList.remove("hide-button");
-              else {
-                document.querySelector(".gg").textContent = `${
-                  player1.getScore() === (bestOfX + 1) / 2
-                    ? `${player1.getName()} Wins`
-                    : `${player2.getName()} Wins`
-                }`;
-                document.querySelector(".gg").classList.remove("hide-gg");
-              }
+              nextButton.classList.remove("hide-button");
 
               nextButton.addEventListener("click", () => {
                 gameboard.resetBoard();
@@ -377,6 +392,8 @@ function playRound(player1, player2, bestOfX) {
 
 function domDisplay() {
   const blockDivs = document.querySelectorAll(".gameboard > div");
+  const playerOneContainer = document.querySelector(".player-1");
+  const playerTwoContainer = document.querySelector(".player-2");
 
   function disableBlocks() {
     blockDivs.forEach((block) => block.classList.add("disabled-block"));
@@ -393,10 +410,40 @@ function domDisplay() {
     });
   }
 
+  function givePlayerOneTurn() {
+    playerOneContainer.classList.add("give-turn");
+  }
+
+  function takePlayerOneTurn() {
+    playerOneContainer.classList.remove("give-turn");
+  }
+
+  function givePlayerTwoTurn() {
+    playerTwoContainer.classList.add("give-turn");
+  }
+
+  function takePlayerTwoTurn() {
+    playerTwoContainer.classList.remove("give-turn");
+  }
+
+  function getPlayerOneContainer() {
+    return playerOneContainer;
+  }
+
+  function getPlayerTwoContainer() {
+    return playerTwoContainer;
+  }
+
   return {
     disableBlocks,
     enableBlocks,
     resetDivBoard,
+    givePlayerOneTurn,
+    takePlayerOneTurn,
+    givePlayerTwoTurn,
+    takePlayerTwoTurn,
+    getPlayerOneContainer,
+    getPlayerTwoContainer,
   };
 }
 

@@ -127,6 +127,10 @@ fieldset > div + div {
   text-transform: capitalize;
 }
 
+[class*="name"] {
+  text-align: center;
+}
+
 button,
 .gg {
   border: 0;
@@ -159,4 +163,12 @@ button:hover,
 button:active,
 .gg:active {
   opacity: 0.5;
+}
+
+.give-turn {
+  outline: 10px solid #9700ff;
+}
+
+.winner {
+  outline: 10px solid lime;
 }
