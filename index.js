@@ -134,9 +134,15 @@ function playRound(player1, player2, bestOfX) {
       blockDivs[i].addEventListener("click", () => {
         if (!blockDivs[i].hasChildNodes()) {
           if (player1.getTurn()) {
-            gameboard.playCross(i + 1);
-            blockDivs[i].textContent = "X";
-            blockDivs[i].classList.add("cross");
+            if (player1.getSymbol() === "cross") {
+              gameboard.playCross(i + 1);
+              blockDivs[i].textContent = "X";
+              blockDivs[i].classList.add("cross");
+            } else {
+              gameboard.playNought(i + 1);
+              blockDivs[i].textContent = "O";
+              blockDivs[i].classList.add("nought");
+            }
 
             player1.toggleTurn();
 
@@ -202,9 +208,15 @@ function playRound(player1, player2, bestOfX) {
               return;
             }
           } else {
-            gameboard.playNought(i + 1);
-            blockDivs[i].textContent = "O";
-            blockDivs[i].classList.add("nought");
+            if (player2.getSymbol() === "cross") {
+              gameboard.playCross(i + 1);
+              blockDivs[i].textContent = "X";
+              blockDivs[i].classList.add("cross");
+            } else {
+              gameboard.playNought(i + 1);
+              blockDivs[i].textContent = "O";
+              blockDivs[i].classList.add("nought");
+            }
 
             player1.toggleTurn();
 
@@ -278,7 +290,9 @@ function playRound(player1, player2, bestOfX) {
     gameboard.getBlocks().forEach((block) => {
       if (block.getState() === "empty") res++;
     });
-    if (res === 0) return true;
+    if (res === 0) {
+      return true;
+    }
     return false;
   }
 
@@ -379,7 +393,11 @@ function domDisplay() {
     });
   }
 
-  return { disableBlocks, enableBlocks, resetDivBoard };
+  return {
+    disableBlocks,
+    enableBlocks,
+    resetDivBoard,
+  };
 }
 
 function playTicTacToe(bestOfX) {
