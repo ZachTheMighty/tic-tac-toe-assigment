@@ -447,7 +447,7 @@ function domDisplay() {
   };
 }
 
-function playTicTacToe(bestOfX) {
+function playTicTacToe() {
   const form = document.querySelector("form");
   let player1;
   let player2;
@@ -496,9 +496,17 @@ function playTicTacToe(bestOfX) {
       document.querySelector(".symbol-2").textContent = player2.getSymbol();
       document.querySelector(".score-2").textContent = "0";
 
+      let bestOfX;
+      do {
+        bestOfX = +prompt(
+          "How many rounds do you want to play? (odd numbers only):",
+        );
+        console.log(bestOfX);
+      } while (bestOfX < 2 || bestOfX % 2 === 0 || !Number.isInteger(bestOfX));
+      document.querySelector(".series").textContent = `(Best of ${bestOfX})`;
       playRound(player1, player2, bestOfX);
     }
   });
 }
 
-playTicTacToe(3);
+playTicTacToe();
